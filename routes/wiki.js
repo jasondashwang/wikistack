@@ -81,7 +81,7 @@ router.get('/search', function(req, res, next) {
       }
     }
   }).then(function(arr) {
-    res.render('search', {pages: arr});
+    res.render('search', {title: 'Search results for ' + req.query['tags'], pages: arr});
   });
 });
 
@@ -133,6 +133,21 @@ router.get('/:pageurl', function(req, res, next) {
   //   res.render('wikipage', {page: page});
   // }).catch(next);
 
+});
+
+
+router.get('/tags/:tag', function(req, res, next){
+  var tag = req.params.tag;
+
+  Page.findAll({
+    where: {
+      tags: {
+        $overlap: [tag]
+      }
+    }
+  }).then(function(arr) {
+    res.render('search', {title: tag, pages: arr});
+  });
 });
 
 module.exports = router;
