@@ -1,3 +1,5 @@
+"use strict";
+
 var Sequelize = require('sequelize');
 var db = new Sequelize('postgres://localhost:5432/wikistack', {logging: false});
 var Page = db.define('page', {
@@ -25,15 +27,13 @@ var Page = db.define('page', {
     }
 },
 // Hooks
-{
-    hooks: {
-        beforeValidate: function (page, options){
-            page.urlTitle = generateUrlTitle(page.title);
-         }
-     }
-}
-
-
+  {
+      hooks: {
+          beforeValidate: function (page, options){
+              page.urlTitle = generateUrlTitle(page.title);
+           }
+       }
+  }
 
 );
 
@@ -50,6 +50,9 @@ var User = db.define('user', {
       allowNull: false
     }
 });
+
+
+Page.belongsTo(User, {as: 'author'});
 
 function generateUrlTitle (title) {
   if (title) {

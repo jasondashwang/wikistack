@@ -6,7 +6,7 @@ var morgan = require('morgan');
 var bodyParser = require('body-parser');
 var path = require('path');
 var models = require('./models');
-
+var Promise = require('bluebird');
 var logger = morgan('dev');
 var app = new express();
 
@@ -23,8 +23,9 @@ swig.setDefaults({ cache: false });
 app.use(logger);
 app.use('/wiki', router);
 
-var userModelPromise = models.User.sync({});
 var pageModelPromise = models.Page.sync({});
+var userModelPromise = models.User.sync({});
+
 Promise.all([userModelPromise, pageModelPromise]).then(function () {
           return models.Page.sync({});
       })

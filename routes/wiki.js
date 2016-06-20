@@ -1,5 +1,6 @@
 var express = require('express');
 var models = require('../models');
+var Promise = require('bluebird');
 var router = express.Router();
 
 router.get('/', function(req, res, next) {
@@ -15,40 +16,39 @@ router.get('/', function(req, res, next) {
 router.post('/', function(req, res, next) {
   var jsonInput = req.body;
 
-  var page = models.Page.build({
-    title: jsonInput.title,
-    content: jsonInput.content,
-    status: jsonInput.status
-  });
-
-  var pagePromise = page.save();
-
-  var user = models.User.build({
-    name: jsonInput.author_name,
-    email: jsonInput.author_email
-  });
-
-  var userPromise = user.save();
-
-
-
-
-  Promise.all([pagePromise, userPromise])
-      .then(function(arr){
-        res.redirect(arr[0].urlTitle);
-      })
-      .catch(function(error){
-        console.log(error);
+  models.User
+    .findOrCreate({where: {name: jsonInput.author_name, email: jsonInput.author_email}})
+    .then(function(values){
+      var user = values[0];
+      var page = models.Page.build({
+        title: jsonInput.title,
+        content: jsonInput.content,
+        status: jsonInput.status
       });
 
+      return page.save().then(function (pageJson){
+        return page.setAuthor(user);
+      });
+
+    }).then(function (page){
+      res.redirect(page.urlTitle);
+    }).catch(next);
 });
+
+
+
 
 router.get('/add', function(req, res, next) {
   res.render('addpage');
 });
 
 router.get('/users', function(req, res, next){
-
+  models.User.findAll({}).then(function(jsonArr) {
+    var users = jsonArr.map(function(json) {
+      return json.dataValues;
+    });
+    res.render('users', {users: users});
+  });
 });
 
 router.get('/users/:username', function(req, res, next){
@@ -56,6 +56,8 @@ router.get('/users/:username', function(req, res, next){
 });
 
 router.post('/users', function(req, res, next){
+
+
 
 });
 
@@ -73,7 +75,6 @@ router.get('/:pageurl', function(req, res, next) {
   models.Page.findOne({
     where: {urlTitle: pageUrl}
   }).then(function (newPage) {
-    console.log(newPage);
     res.render('wikipage', newPage.dataValues);
   }).catch(next);
 });
