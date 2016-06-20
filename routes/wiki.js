@@ -25,7 +25,8 @@ router.post('/', function(req, res, next) {
       var page = models.Page.build({
         title: jsonInput.title,
         content: jsonInput.content,
-        status: jsonInput.status
+        status: jsonInput.status,
+        tags: jsonInput.tags.split(' ')
       });
 
       return page.save().then(function (pageJson){
@@ -71,6 +72,19 @@ router.get('/users/:userId', function(req, res, next) {
 
 });
 
+router.get('/search', function(req, res, next) {
+  var tagArr = req.query['tags'].split(' ');
+  Page.findAll({
+    where: {
+      tags: {
+        $overlap: tagArr
+      }
+    }
+  }).then(function(arr) {
+    res.render('search', {pages: arr});
+  });
+});
+
 router.get('/users/:username', function(req, res, next){
 
 });
@@ -103,6 +117,7 @@ router.get('/:pageurl', function(req, res, next) {
       if (page === null) {
           res.status(404).send();
       } else {
+          console.log(page)
           res.render('wikipage', {
               page: page
           });

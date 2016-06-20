@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+
+{% block content %}
+  <h3>Search results</h3>
+  <hr>
+  <ul class="list-unstyled">
+    <ul>
+      {% for page in pages %}
+        <li><a href="{{page.urlTitle}}">{{page.title}}</a></li>
+      {% endfor %}
+    </ul>
+  </ul>
+{% endblock %}
