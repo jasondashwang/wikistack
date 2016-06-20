@@ -1,10 +1,11 @@
 
 var express = require('express');
 var swig = require('swig');
-var routes = require('./routes');
+var router = require('./routes/wiki');
 var morgan = require('morgan');
 var bodyParser = require('body-parser');
 var path = require('path');
+var models = require('./models');
 
 var logger = morgan('dev');
 var app = new express();
@@ -20,9 +21,16 @@ app.set('views', path.join(__dirname, '/views')); // where to find the views
 swig.setDefaults({ cache: false });
 
 app.use(logger);
-
-var server = app.listen(3000, function(){
-  console.log('Server started on port 3000');
-});
+app.use('/wiki', router)
+models.User.sync({})
+.then(function () {
+    return models.Page.sync({})
+})
+.then(function () {
+    app.listen(3000, function(){
+    console.log('Server started on port 3000');
+  });
+})
+.catch(console.error);
 
 app.use(express.static(path.join(__dirname, '/public')));
