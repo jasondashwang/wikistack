@@ -3,8 +3,13 @@ var models = require('../models');
 var router = express.Router();
 
 router.get('/', function(req, res, next) {
-  res.redirect('/');
-  res.end();
+  models.Page.findAll({}).then(function(jsonArr) {
+    var pages = jsonArr.map(function(json) {
+      return json.dataValues;
+    });
+    res.render('index', {pages: pages});
+  });
+
 });
 
 router.post('/', function(req, res, next) {
@@ -65,8 +70,12 @@ router.delete('/users/:username', function(req, res, next){
 
 router.get('/:pageurl', function(req, res, next) {
   var pageUrl = req.params.pageurl;
-
-  res.end();
+  models.Page.findOne({
+    where: {urlTitle: pageUrl}
+  }).then(function (newPage) {
+    console.log(newPage);
+    res.render('wikipage', newPage.dataValues);
+  }).catch(next);
 });
 
 module.exports = router;

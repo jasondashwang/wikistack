@@ -23,8 +23,8 @@ swig.setDefaults({ cache: false });
 app.use(logger);
 app.use('/wiki', router);
 
-var userModelPromise = models.User.sync({ force: true});
-var pageModelPromise = models.Page.sync({ force: true});
+var userModelPromise = models.User.sync({});
+var pageModelPromise = models.Page.sync({});
 Promise.all([userModelPromise, pageModelPromise]).then(function () {
           return models.Page.sync({});
       })
