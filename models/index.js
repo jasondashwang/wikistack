@@ -24,6 +24,10 @@ var Page = db.define('page', {
     date: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW
+    },
+    tags: {
+        type: Sequelize.ARRAY(Sequelize.TEXT),
+        defaultValue: null
     }
 },
 // Hooks
@@ -53,6 +57,9 @@ var User = db.define('user', {
 
 
 Page.belongsTo(User, {as: 'author'});
+
+
+
 
 function generateUrlTitle (title) {
   if (title) {

@@ -2,6 +2,9 @@ var express = require('express');
 var models = require('../models');
 var Promise = require('bluebird');
 var router = express.Router();
+var User = models.User;
+var Page = models.Page;
+
 
 router.get('/', function(req, res, next) {
   models.Page.findAll({}).then(function(jsonArr) {
@@ -66,7 +69,7 @@ router.get('/users/:userId', function(req, res, next) {
   })
   .catch(next);
 
-})
+});
 
 router.get('/users/:username', function(req, res, next){
 
@@ -86,32 +89,35 @@ router.delete('/users/:username', function(req, res, next){
 
 
 router.get('/:pageurl', function(req, res, next) {
-  var pageUrl = req.params.pageurl;
-  var pagePromise = models.Page.findOne({
-    where: {urlTitle: pageUrl}
-  }).then(function (page) {
-    var authorId = page.authorId;
-    models.User.findOne({
-      where: {id: authorId}
-    }).then(function (user) {
-      res.render('wikipage', {user:user, page: page});
-    });
-  }).catch(next);
+  Page.findOne({
+      where: {
+          urlTitle: req.params.pageurl
+      },
+      include: [
+          {model: User, as: 'author'}
+      ]
+  })
+  .then(function (page) {
+      // page instance will have a .author property
+      // as a filled in user object ({ name, email })
+      if (page === null) {
+          res.status(404).send();
+      } else {
+          res.render('wikipage', {
+              page: page
+          });
+      }
+  })
+  .catch(next);
 
-  // Promise.all([
-  //   userPromise,
-  //   pagesPromise
-  // ])
-  // .then(function(values) {
-  //   var user = values[0];
-  //   var pages = values[1];
-  //   res.render('wikipage', {user: user, pages: pages});
-  // })
-
-
-  // .then(function (newPage) {
-  //   res.render('wikipage', newPage.dataValues);
+  // var pageUrl = req.params.pageurl;
+  // models.Page.findOne({
+  //   where: {urlTitle: pageUrl},
+  //   include: [{model: models.User, as: 'author'}]
+  // }).then(function (page) {
+  //   res.render('wikipage', {page: page});
   // }).catch(next);
+
 });
 
 module.exports = router;
