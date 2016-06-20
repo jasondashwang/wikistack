@@ -10,7 +10,6 @@ router.get('/', function(req, res, next) {
     });
     res.render('index', {pages: pages});
   });
-
 });
 
 router.post('/', function(req, res, next) {
@@ -35,9 +34,6 @@ router.post('/', function(req, res, next) {
     }).catch(next);
 });
 
-
-
-
 router.get('/add', function(req, res, next) {
   res.render('addpage');
 });
@@ -51,13 +47,32 @@ router.get('/users', function(req, res, next){
   });
 });
 
+router.get('/users/:userId', function(req, res, next) {
+  var userPromise = models.User.findById(req.params.userId);
+  var pagesPromise = models.Page.findAll({
+    where: {
+      authorId: req.params.userId
+    }
+  });
+
+  Promise.all([
+    userPromise,
+    pagesPromise
+  ])
+  .then(function(values) {
+    var user = values[0];
+    var pages = values[1];
+    res.render('userpage', {user: user, pages: pages});
+  })
+  .catch(next);
+
+})
+
 router.get('/users/:username', function(req, res, next){
 
 });
 
 router.post('/users', function(req, res, next){
-
-
 
 });
 
@@ -72,11 +87,31 @@ router.delete('/users/:username', function(req, res, next){
 
 router.get('/:pageurl', function(req, res, next) {
   var pageUrl = req.params.pageurl;
-  models.Page.findOne({
+  var pagePromise = models.Page.findOne({
     where: {urlTitle: pageUrl}
-  }).then(function (newPage) {
-    res.render('wikipage', newPage.dataValues);
+  }).then(function (page) {
+    var authorId = page.authorId;
+    models.User.findOne({
+      where: {id: authorId}
+    }).then(function (user) {
+      res.render('wikipage', {user:user, page: page});
+    });
   }).catch(next);
+
+  // Promise.all([
+  //   userPromise,
+  //   pagesPromise
+  // ])
+  // .then(function(values) {
+  //   var user = values[0];
+  //   var pages = values[1];
+  //   res.render('wikipage', {user: user, pages: pages});
+  // })
+
+
+  // .then(function (newPage) {
+  //   res.render('wikipage', newPage.dataValues);
+  // }).catch(next);
 });
 
 module.exports = router;
