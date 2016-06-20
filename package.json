@@ -19,5 +19,12 @@
   "homepage": "https://github.com/jasonwang67/wikistack#readme",
   "devDependencies": {
     "nodemon": "^1.9.2"
+  },
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "morgan": "^1.7.0",
+    "path": "^0.12.7",
+    "swig": "^1.4.2"
   }
 }
