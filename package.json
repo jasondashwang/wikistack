@@ -1,0 +1,23 @@
+{
+  "name": "wikistack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon -e html,js,css ./app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jasonwang67/wikistack.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jasonwang67/wikistack/issues"
+  },
+  "homepage": "https://github.com/jasonwang67/wikistack#readme",
+  "devDependencies": {
+    "nodemon": "^1.9.2"
+  }
+}
