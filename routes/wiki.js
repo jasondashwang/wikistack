@@ -34,6 +34,7 @@ router.post('/', function(req, res, next) {
       });
 
     }).then(function (page){
+      console.log(page.urlTitle);
       res.redirect(page.urlTitle);
     }).catch(next);
 });
